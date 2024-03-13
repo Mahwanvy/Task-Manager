@@ -37,11 +37,10 @@ public class MainController {
 	  return "redirect:/loginPage";
 	  }
 
-	@GetMapping("/loginPage")
-	public String loginPage(TmUser user, HttpServletRequest request, Model model) {
-		model.addAttribute("error", request.getParameter("error"));
-		return "login.html";
-	}
+	 @RequestMapping("/login")
+	    public String login(TmUser user) {
+	        return "login.html";
+	    }
 
 	/*
 	 * @PostMapping("/login") public String login(@RequestBody TmUser

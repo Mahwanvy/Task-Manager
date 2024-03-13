@@ -78,8 +78,8 @@ public class SecurityConfig {
 					//.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()) 
 					//.authorizeHttpRequests(auth-> auth .requestMatchers("/user/**").permitAll())
 				      .authorizeHttpRequests(auth -> auth
-				 			.requestMatchers("/").permitAll()
-				            .anyRequest().authenticated()
+				 			//.requestMatchers("/").permitAll()
+				            .anyRequest().permitAll()
 				    )
 			  		.formLogin((formLogin) -> formLogin
 			            .loginPage("/login")
