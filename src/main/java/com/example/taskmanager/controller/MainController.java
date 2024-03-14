@@ -1,14 +1,17 @@
 package com.example.taskmanager.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.taskmanager.config.CustomAuthenticationManager;
 import com.example.taskmanager.model.Task;
@@ -24,8 +27,8 @@ public class MainController {
 	@Autowired
 	private TmUserService userService;
 
-	//@Autowired
-	//private CustomAuthenticationManager authenticationManager;
+	@Autowired
+	private CustomAuthenticationManager authenticationManager;
 
 	@Autowired
 	public MainController(TmUserService userService) {
@@ -34,57 +37,38 @@ public class MainController {
 
 	 @RequestMapping("/")
 	 public String index() {
-	  return "redirect:/loginPage";
+	  return "redirect:/login";
 	  }
 
 	 @RequestMapping("/login")
-	    public String login(TmUser user) {
+	    public String loginPage() {
 	        return "login.html";
 	    }
 
-	/*
-	 * @PostMapping("/login") public String login(@RequestBody TmUser
-	 * user,HttpServletRequest request) { TmUser authenticatedUser =
-	 * userService.authenticateUser(user.getEmail(), user.getPassword()); if
-	 * (authenticatedUser != null) { request.getSession().setAttribute("user",
-	 * authenticatedUser); return "success"; } else { return "fail"; } }
-	 */
-
 	
-	 @PostMapping("/login")	  
+	 @PostMapping("/userLogin")	  
 	 @ResponseBody public String userLogin(@RequestBody TmUser user,
 	 HttpServletRequest request) {
-		 TmUser authenticatedUser = userService.authenticateUser(user.getEmail(), user.getPassword());
-		 if (authenticatedUser != null) { 
+		 
+		 List<GrantedAuthority> grantedAuths = new ArrayList<>();
+	        grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
+	        
+		 Authentication authentication = authenticationManager
+				 			.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(),grantedAuths));
+		 
+		 SecurityContextHolder.getContext().setAuthentication(authentication);
+		 TmUser tmUser = userService.getUserByEmail(user.getEmail());
+		 if (tmUser != null) { 
 				 HttpSession session =request.getSession(true); 
-				 session.setAttribute("userDetails",authenticatedUser);
-			 return "Successful Login"; 
-		 } else {
-			 return null; 
-		 } 
+				 session.setAttribute("userDetails",tmUser);
+				 return "Successful Login";
+		 }
+			  
+		else {
+			return null;
+		}
 	 }
 	 
-
-		/*
-		 @PostMapping("/process_login") public String
-		 processLogin(@ModelAttribute("user") TmUser user, RedirectAttributes
-		 redirectAttributes, HttpSession session) { try { Authentication
-		 authentication = SecurityContextHolder.getContext().getAuthentication();
-		 authenticationManager.authenticate(authentication);
-		 session.setAttribute("username", user.getEmail()); // Store user information
-		 in session redirectAttributes.addFlashAttribute("success",
-		 "You have been logged in successfully!"); return "redirect:/dashboard"; }
-		 catch (AuthenticationException e) {
-		 redirectAttributes.addFlashAttribute("error", "Bad Credentials"); return
-		 "redirect:/login"; } }
-		 
-		 @PostMapping("/login") public String userLogin(HttpServletRequest
-		 request, @RequestBody TmUser user) { Authentication authentication =
-		 SecurityContextHolder.getContext().getAuthentication();
-		 
-		 if (authentication != null && authentication.isAuthenticated()) { return
-		 "Already authenticated"; } else { return "Authentication in progress"; } }
-		 */
 
 	@PostMapping("/logout")
 	public String logout(HttpServletRequest request) {

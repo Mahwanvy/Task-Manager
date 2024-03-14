@@ -226,18 +226,18 @@ body {
     border-bottom-right-radius: 10px;
 }
 .form-control {
-    border:  1px solid #ced4da; /* Remove all borders */
-    border-radius: 0; /* Remove border radius */
-    background-color: transparent; /* Make background transparent */
-    outline: none; /* Remove outline */
-    box-shadow: none; /* Remove box shadow */
+    border:  1px solid #ced4da; 
+    border-radius: 0; 
+    background-color: transparent; 
+    outline: none; 
+    box-shadow: none; 
 }
 
 
 /* Style for input when focused */
 .form-control:focus {
-    border-color: #007bff; /* Remove the border color on focus */
-    box-shadow: none; /* Remove box shadow on focus */
+    border-color: #007bff; 
+    box-shadow: none; 
 }
 
 .btn-close {

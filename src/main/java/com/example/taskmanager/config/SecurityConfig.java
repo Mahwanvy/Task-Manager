@@ -55,42 +55,47 @@ public class SecurityConfig {
 	    public BCryptPasswordEncoder passwordEncoder() {
 	        return new BCryptPasswordEncoder();
 	    }
-		/*
-		 * @Bean public UserDetailsService userDetailsService() { return new
-		 * CustomUserService(); }
-		 * 
-		 * @Bean public DaoAuthenticationProvider authenticationProvider() {
-		 * DaoAuthenticationProvider daoAuthenticationProvider = new
-		 * DaoAuthenticationProvider();
-		 * daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-		 * daoAuthenticationProvider.setPasswordEncoder(passwordEncoder()); return
-		 * daoAuthenticationProvider ; }
-		 */
+		
+		 @Bean public UserDetailsService getDetailsService() { 
+			 return new CustomUserService(); 
+			 }
+		 
+		 @Bean public DaoAuthenticationProvider authenticationProvider() {
+		 DaoAuthenticationProvider daoAuthenticationProvider = new
+		  DaoAuthenticationProvider();
+		 daoAuthenticationProvider.setUserDetailsService(getDetailsService());
+		 daoAuthenticationProvider.setPasswordEncoder(passwordEncoder()); return
+		  daoAuthenticationProvider ; }
+		 
 	 
 	 
 	 @Bean public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 			  http 
-			  		.csrf((csrf) -> csrf .disable())
+			  		.csrf(csrf -> csrf .disable())
 			  		.cors(AbstractHttpConfigurer::disable) .headers(httpSecurityHeadersConfigurer
 			  				 -> { httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.
 			  				  FrameOptionsConfig::disable); })
 					
-					//.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()) 
-					//.authorizeHttpRequests(auth-> auth .requestMatchers("/user/**").permitAll())
 				      .authorizeHttpRequests(auth -> auth
-				 			//.requestMatchers("/").permitAll()
+								/*
+								  .requestMatchers("/").permitAll()
+								  .requestMatchers("/h2-console/**").permitAll()
+								  .requestMatchers("/user/**").permitAll()
+								  .requestMatchers("/task/**").permitAll()
+								  .requestMatchers("/userLogin/**").permitAll()
+								 */
 				            .anyRequest().permitAll()
 				    )
 			  		.formLogin((formLogin) -> formLogin
 			            .loginPage("/login")
-			            .loginProcessingUrl("/process_login")
-			            .defaultSuccessUrl("/dashboard")
+			            //.loginProcessingUrl("/userLogin")
+			            //.defaultSuccessUrl("/dashboard",true)
 			            .permitAll()
 			        )
 			  		.sessionManagement((sessionManagement) -> sessionManagement
 				            .maximumSessions(1) 
-				            .expiredUrl("/login?expired=true"));
-			  		//.authenticationManager(new CustomAuthenticationManager());
+				            .expiredUrl("/login?expired=true"))
+			  		.authenticationManager(new CustomAuthenticationManager());
 			  return http.build(); 
 	 }
 	 

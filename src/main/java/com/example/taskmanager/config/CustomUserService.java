@@ -19,30 +19,15 @@ public class CustomUserService implements UserDetailsService {
 	@Autowired
     private BCryptPasswordEncoder passwordEncoder;
 	
-	
-	@Autowired
-	public CustomUserService(TmUserRepository tmUserRepo, BCryptPasswordEncoder passwordEncoder) {
-		super();
-		this.tmUserRepo = tmUserRepo;
-		this.passwordEncoder = passwordEncoder;
-	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		TmUser tmuser=tmUserRepo.findByEmail(username);
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		TmUser tmuser=tmUserRepo.findByEmail(email);
 		if (tmuser==null) {
 			throw new UsernameNotFoundException("Username not found");
 		}else {
 			return new CustomUser(tmuser);
 		}
-	}
-
-	public TmUser authenticateUser(String email, String password) {
-        TmUser user = tmUserRepo.findByEmail(email);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return user;
-        }
-		return null;
 	}
 
 }
